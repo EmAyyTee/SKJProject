@@ -4,32 +4,47 @@ import java.io.*;
 
 public class DAS {
     private int port, number;
+    private List<Integer> recivedNumbers = new ArrayList<>();
     private DatagramSocket socket;
 
     public DAS(int port, int number) throws SocketException {
         this.port = port;
         this.number = number;
-        this.socket = new DatagramSocket(port);
-        this.socket.setSoTimeout(5000);
-
     }
 
-    private boolean isMasterAvaliable(){
-        try {
-            byte[] discoveryMessage = "DISCOVER.MASTER".getBytes();
-            DatagramPacket packet = new DatagramPacket(discoveryMessage, discoveryMessage.length, InetAddress.getByName("255.255.255.255"), port);
-            socket.send(packet);
-
-            byte[] buffer = new byte[256];
-            DatagramPacket responce = new DatagramPacket(buffer, buffer.length);
-            socket.receive(responce);
-
-            return true;
-        } catch (SocketTimeoutException e) {
-            return false;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
+    public void start() throws IOException{
+        try{
+            socket = new DatagramSocket(port);
+            System.out.println("Running as master");
+            master();
+        } catch (BindException e) {
+            System.out.println("Running as slave");
+            slave();
         }
+    }
+
+    private void master() throws IOException {
+        byte[] buffer = new byte[1400];
+        DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+
+        while (true){
+            socket.receive(packet);
+            String message = new String(packet.getData(), 0, packet.getLength());
+            int recivedValue = Integer.parseInt(message);
+
+            if (recivedValue == 0) {
+                calculateAverage();
+            } else if (recivedValue == -1){
+                broadcastMessage("-1");
+
+            }
+        }
+    }
+
+    private void broadcastMessage(String message) throws IOException{
+        byte[] data = message.getBytes();
+        DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("255.255.255.255"), port);
+        socket.send(packet);
+        System.out.println("Broadcasted: " + message);
     }
 }
