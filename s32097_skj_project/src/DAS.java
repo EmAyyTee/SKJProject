@@ -3,7 +3,7 @@ import java.util.*;
 import java.io.*;
 
 public class DAS {
-    private int port, number;
+    private final int port, number;
     private List<Integer> recivedNumbers = new ArrayList<>();
     private DatagramSocket socket;
 
@@ -36,9 +36,13 @@ public class DAS {
                 calculateAverage();
             } else if (recivedValue == -1){
                 broadcastMessage("-1");
-
+                break;
+            } else {
+                System.out.println("Recived: " + recivedValue);
+                recivedNumbers.add(recivedValue);
             }
         }
+        socket.close();
     }
 
     private void calculateAverage() throws IOException{
@@ -55,5 +59,15 @@ public class DAS {
         DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("255.255.255.255"), port);
         socket.send(packet);
         System.out.println("Broadcasted: " + message);
+    }
+
+    private void slave() throws IOException{
+        DatagramSocket socket = new DatagramSocket();
+        byte[] data = String.valueOf(number).getBytes();
+
+        DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("localhost"), port);
+        socket.send(packet);
+        System.out.println("Sent to master: " + number);
+        socket.close();
     }
 }
