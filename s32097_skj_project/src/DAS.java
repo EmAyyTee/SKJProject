@@ -10,6 +10,9 @@ public class DAS {
     public DAS(int port, int number) throws SocketException {
         this.port = port;
         this.number = number;
+        if (number != 0 || number != -1){
+            recivedNumbers.add(number);
+        }
     }
 
     public void start() throws IOException{
@@ -46,11 +49,10 @@ public class DAS {
             if (recivedValue == 0){
                 calculateAverage();
             } else if (recivedValue == -1){
-                broadcastMessage("-1");
+                sendMessage("-1");
                 break;
             } else {
                 System.out.println("Recived: " + recivedValue);
-                recivedNumbers.add(recivedValue);
             }
         }
         socket.close();
@@ -60,16 +62,20 @@ public class DAS {
         if (recivedNumbers.isEmpty()) return;
 
         double sum = recivedNumbers.stream().mapToInt(Integer::intValue).sum();
-        int average = (int) (sum / recivedNumbers.size());
+        int average = (int) Math.floor((sum / recivedNumbers.size()));
         System.out.println("Calculated average: " + average);
-        broadcastMessage(String.valueOf(average));
+        sendMessage(String.valueOf(average));
     }
 
-    private void broadcastMessage(String message) throws IOException{
-        byte[] data = message.getBytes();
-        DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("255.255.255.255"), port);
-        socket.send(packet);
-        System.out.println("Broadcasted: " + message);
+    private void sendMessage(String message) throws IOException{
+        try {
+            byte[] data = message.getBytes();
+            DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("255.255.255.255"), port);
+            socket.send(packet);
+            System.out.println("Broadcasted: " + message);
+        } catch (IOException e){
+            System.out.println("Something went wrong with the broadcast :(");
+        }
     }
 
     private void slave() throws IOException{

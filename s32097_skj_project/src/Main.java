@@ -24,15 +24,15 @@ public class Main {
             System.out.println("Tell me what to do:\n1) Run test cases\n2)Run the server");
             Scanner sc = new Scanner(System.in);
 
-            int answerFromUser = sc.nextInt();
+            int answerFromUser = Integer.parseInt(sc.nextLine());
 
             switch(answerFromUser) {
                 case 1 -> TestCases.caseTesting();
                 case 2 -> {
                     System.out.println("Give me a port number: ");
-                    int numberToInput = sc.nextInt();
+                    int masterPort = Integer.parseInt(sc.nextLine());
                     System.out.println("Give me a number to send: ");
-                    int masterPort = sc.nextInt();
+                    int numberToInput = sc.nextInt();
                     Thread masterThread = new Thread(() -> {
                         try {
                             DAS master = new DAS(masterPort, numberToInput);
