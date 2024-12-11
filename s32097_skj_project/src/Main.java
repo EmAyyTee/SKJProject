@@ -6,8 +6,8 @@ import java.util.concurrent.TimeUnit;
 public class Main {
     public static void main(String[] args) throws InterruptedException {
         if (args.length == 2){
-            int masterPort = Integer.parseInt(args[1]);
-            int numberToInput = Integer.parseInt(args[2]);
+            int masterPort = Integer.parseInt(args[0]);
+            int numberToInput = Integer.parseInt(args[1]);
             Thread masterThread = new Thread(() -> {
                 try {
                     DAS master = new DAS(masterPort, numberToInput);
