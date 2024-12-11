@@ -24,7 +24,7 @@ public class DAS {
     }
 
     private void master() throws IOException {
-        byte[] buffer = new byte[1400];
+        byte[] buffer = new byte[1024];
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
 
         while (true){
@@ -60,7 +60,7 @@ public class DAS {
         if (recivedNumbers.isEmpty()) return;
 
         double sum = recivedNumbers.stream().mapToInt(Integer::intValue).sum();
-        double average = sum / recivedNumbers.size();
+        int average = (int) (sum / recivedNumbers.size());
         System.out.println("Calculated average: " + average);
         broadcastMessage(String.valueOf(average));
     }
