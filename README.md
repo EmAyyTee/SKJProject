@@ -3,7 +3,7 @@
 # Dokumentacja Aplikacji DAS
 
 ## Wstęp
-Aplikacja DAS (Distributed Averaging System) realizuje rozproszony system uśredniający, wykorzystując protokół UDP. Umożliwia ona komunikację pomiędzy procesami działającymi w trybie **master** i **slave** w sieci lokalnej. Funkcjonalność aplikacji została zaprojektowana zgodnie z wymaganiami przedstawionymi w specyfikacji projektu.
+Aplikacja DAS (Distributed Averaging System) realizuje rozproszony system uśredniający, wykorzystując protokół UDP. Umożliwia ona komunikację pomiędzy procesami działającymi w trybie **master** i **slave** w sieci lokalnej.
 
 ## Struktura aplikacji
 
@@ -26,24 +26,10 @@ Proces w trybie `master` otwiera gniazdo UDP na zadanym porcie i oczekuje na kom
    Średnia jest obliczana jako suma wszystkich liczb podzielona przez ich ilość. Wynik jest zaokrąglany do najbliższej liczby całkowitej.
 
 3. **Rozgłoszenie komunikatów**:
-   Aplikacja rozsyła komunikaty UDP do wszystkich komputerów w lokalnej sieci na zdefiniowanym porcie (broadcast).
+   Aplikacja rozsyła komunikaty UDP do wszystkich komputerów w lokalnej sieci na zdefiniowanym porcie.
 
 ### Tryb `slave`
 Proces w trybie `slave` wysyła wartość do `master` na podanym porcie i kończy działanie. Tryb `slave` wybierany jest automatycznie, jeśli port podany przy uruchomieniu aplikacji jest zajęty.
-
-### Zarządzanie uruchamianiem
-- Proces wybiera tryb działania (`master` lub `slave`) na podstawie możliwości otwarcia portu.
-- Aplikacja umożliwia uruchomienie testów lub serwera na podstawie wyboru użytkownika.
-
-## Protokół komunikacyjny
-
-Aplikacja korzysta z protokołu UDP do przesyłania komunikatów. Komunikaty mają następujące zasady:
-
-- Wartości liczbowe są przesyłane jako ciągi znaków (string).
-- Wartości `0` i `-1` mają specjalne znaczenie, zgodnie z opisem powyżej.
-- W przypadku komunikatów z błędnym formatem, proces ignoruje wiadomość i wypisuje odpowiedni komunikat ostrzegawczy.
-
-## Implementacja
 
 ### Kluczowe metody w `DASclass`
 - `start()`: Inicjalizuje tryb działania (master/slave).
@@ -63,7 +49,7 @@ Klasa ta zawiera gotowe scenariusze testowe:
 
 1. Skompiluj plik za pomocą polecenia:
    ```
-   javac DAS.java
+   javac *.java
    ```
 
 2. Uruchom aplikację:
@@ -87,6 +73,6 @@ Klasa ta zawiera gotowe scenariusze testowe:
 - **Brak obsługi wielu instancji master**: System zakłada, że w sieci lokalnej działa tylko jedna instancja `master` na danym porcie.
 
 ## Podsumowanie
-Aplikacja realizuje rozproszony system uśredniający zgodnie z założeniami projektu. Umożliwia łatwą konfigurację i testowanie w różnych środowiskach. Mechanizm komunikacji UDP oraz implementacja trybów `master` i `slave` spełniają wymagania, choć istnieje możliwość dalszego rozwoju aplikacji, np. dodania mechanizmu potwierdzania odbioru wiadomości.
+Aplikacja realizuje rozproszony system komunikacji pomiędzy serverem, a klientem. Umożliwia łatwą konfigurację i testowanie w różnych środowiskach. Mechanizm komunikacji UDP oraz implementacja trybów `master` i `slave` spełniają wymagania, choć istnieje możliwość dalszego rozwoju aplikacji, np. dodania mechanizmu potwierdzania odbioru wiadomości.
 
 
