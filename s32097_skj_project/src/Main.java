@@ -22,6 +22,7 @@ public class Main {
             TimeUnit.SECONDS.sleep(1);
 
             System.out.println("\nTest Case 2: Slave sends a number to master");
+
             Thread slaveThread1 = new Thread(() -> {
                 try {
                     DAS slave = new DAS(masterPort, 20);
@@ -35,6 +36,7 @@ public class Main {
             TimeUnit.SECONDS.sleep(1);
 
             System.out.println("\nTest Case 3: Slave sends 0 to trigger averaging");
+
             Thread slaveThread2 = new Thread(() -> {
                 try {
                     DAS slave = new DAS(masterPort, 0);
@@ -44,8 +46,8 @@ public class Main {
                 }
             });
             slaveThread2.start();
-
             TimeUnit.SECONDS.sleep(1);
+
             System.out.println("\nTest Case 4: Slave sends -1 to terminate master");
             Thread slaveThread3 = new Thread(() -> {
                 try {

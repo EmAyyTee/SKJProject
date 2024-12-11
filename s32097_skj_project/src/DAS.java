@@ -30,9 +30,20 @@ public class DAS {
         while (true){
             socket.receive(packet);
             String message = new String(packet.getData(), 0, packet.getLength());
-            int recivedValue = Integer.parseInt(message);
+            int recivedValue = 0;
 
-            if (recivedValue == 0) {
+            if (message.contains(".")){
+                System.out.println("Recived broadcasted average: " + message);
+                continue;
+            }else {
+                try {
+                    recivedValue = Integer.parseInt(message);
+                } catch (NumberFormatException e){
+                    System.out.println("Invalid integer recived: " + message);
+                    continue;
+                }
+            }
+            if (recivedValue == 0){
                 calculateAverage();
             } else if (recivedValue == -1){
                 broadcastMessage("-1");
