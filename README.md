@@ -73,6 +73,6 @@ Klasa ta zawiera gotowe scenariusze testowe:
 - **Brak obsługi wielu instancji master**: System zakłada, że w sieci lokalnej działa tylko jedna instancja `master` na danym porcie.
 
 ## Podsumowanie
-Aplikacja realizuje rozproszony system komunikacji pomiędzy serverem, a klientem. Umożliwia łatwą konfigurację i testowanie w różnych środowiskach. Mechanizm komunikacji UDP oraz implementacja trybów `master` i `slave` spełniają wymagania, choć istnieje możliwość dalszego rozwoju aplikacji, np. dodania mechanizmu potwierdzania odbioru wiadomości.
+Aplikacja realizuje rozproszony system komunikacji pomiędzy serverem, a klientem. Umożliwia łatwą konfigurację i testowanie w różnych środowiskach. Jej głównymi założeniami jest wyświetlanie dotychczasowo podanych liczb oraz obliczanie ich średniej. Mechanizm komunikacji UDP oraz implementacja trybów `master` i `slave` spełniają oczekiwania, choć istnieje możliwość dalszego rozwoju aplikacji, np. dodania mechanizmu potwierdzania odbioru wiadomości.
 
 
