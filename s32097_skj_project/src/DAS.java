@@ -41,6 +41,15 @@ public class DAS {
         }
     }
 
+    private void calculateAverage() throws IOException{
+        if (recivedNumbers.isEmpty()) return;
+
+        double sum = recivedNumbers.stream().mapToInt(Integer::intValue).sum();
+        double average = sum / recivedNumbers.size();
+        System.out.println("Calculated average: " + average);
+        broadcastMessage(String.valueOf(average));
+    }
+
     private void broadcastMessage(String message) throws IOException{
         byte[] data = message.getBytes();
         DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("255.255.255.255"), port);
