@@ -1,0 +1,177 @@
+# Dokumentacja Aplikacji DAS
+
+## Wstęp
+Aplikacja DAS (Distributed Averaging System) to system rozproszony realizujący obliczanie średnich przy użyciu protokołu UDP. 
+Aplikacja składa się z trzech kluczowych komponentów: klasy głównej `DAS`, klasy obsługującej logikę `DASclass`, oraz modułu testowego `TestCases`.
+Dokumentacja opisuje szczegółowo działanie każdej części kodu oraz zawiera przykładową implementację zarówno `master`, jak i `slave` w języku C++.
+
+## Szczegóły implementacji
+
+### Klasa `DAS`
+Klasa główna `DAS` odpowiada za:
+- Parsowanie argumentów wiersza poleceń.
+- Decydowanie o trybie działania aplikacji (interaktywny, testowy lub bezpośredni start `master`).
+- Uruchamianie odpowiednich procesów w wątkach.
+
+#### Kluczowe fragmenty:
+1. **Uruchomienie w trybie bezpośrednim:**
+   if (args.length == 2) {
+       int masterPort = Integer.parseInt(args[0]);
+       int numberToInput = Integer.parseInt(args[1]);
+       Thread masterThread = new Thread(() -> {
+           try {
+               DASclass master = new DASclass(masterPort, numberToInput);
+               master.start();
+           } catch (IOException e) {
+               e.printStackTrace();
+           }
+       });
+       masterThread.start();
+   }
+
+2. **Tryb interaktywny:**
+   Pozwala użytkownikowi na wybór pomiędzy uruchamianiem serwera a testowaniem.
+
+   System.out.println("Tell me what to do:\n1) Run test cases\n2)Run the server");
+   Scanner sc = new Scanner(System.in);
+   int answerFromUser = Integer.parseInt(sc.nextLine());
+   if (answerFromUser == 1) TestCases.caseTesting();
+
+### Klasa `DASclass`
+`DASclass` realizuje główną logikę systemu, w tym:
+- Otwieranie i zarządzanie gniazdem UDP.
+- Obsługę trybów `master` i `slave`.
+- Implementację protokołu komunikacyjnego.
+
+#### Metody kluczowe:
+1. **`start()`**
+   Decyduje o roli procesu (`master` lub `slave`) na podstawie dostępności portu.
+   try {
+       socket = new DatagramSocket(port);
+       System.out.println("Running as master");
+       master();
+   } catch (BindException e) {
+       System.out.println("Running as slave");
+       slave();
+   }
+
+2. **`master()`**
+   Obsługuje komunikaty przychodzące i zarządza listą liczb.
+
+   if (number != 0 && number != -1) recivedNumbers.add(number);
+   while (true) {
+       socket.receive(packet);
+       String message = new String(packet.getData(), 0, packet.getLength());
+       int recivedValue = Integer.parseInt(message);
+       if (recivedValue == 0) calculateAverage();
+       else if (recivedValue == -1) {
+           sendMessage("-1");
+           break;
+       } else recivedNumbers.add(recivedValue);
+   }
+
+3. **`slave()`**
+   Wysyła pojedynczy komunikat do `master` i kończy działanie.
+
+   DatagramSocket socket = new DatagramSocket();
+   byte[] data = String.valueOf(number).getBytes();
+   DatagramPacket packet = new DatagramPacket(data, data.length, InetAddress.getByName("localhost"), port);
+   socket.send(packet);
+   socket.close();
+
+
+4. **`calculateAverage()`**
+   Oblicza średnią z przechowywanych liczb i rozsyła ją jako broadcast.
+
+   double sum = recivedNumbers.stream().mapToInt(Integer::intValue).sum();
+   int average = (int) Math.round(sum / recivedNumbers.size());
+   sendMessage(String.valueOf(average));
+
+
+### Klasa `TestCases`
+Moduł testowy automatyzuje testowanie funkcjonalności aplikacji. Przykładowe scenariusze:
+- Uruchomienie `master`.
+- Wysłanie liczby przez `slave`.
+- Obliczenie średniej po wysłaniu `0`.
+- Zakończenie działania po wysłaniu `-1`.
+
+#### Przykład testu:
+
+Thread slaveThread = new Thread(() -> {
+    try {
+        DASclass slave = new DASclass(masterPort, 10);
+        slave.start();
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+});
+slaveThread.start();
+
+
+## Przykładowa implementacja w C++
+
+### Master
+
+#include <iostream>
+#include <vector>
+#include <string>
+#include <sstream>
+#include <thread>
+#include <asio.hpp>
+
+using asio::ip::udp;
+
+void run_master(short port) {
+    asio::io_context io_context;
+    udp::socket socket(io_context, udp::endpoint(udp::v4(), port));
+    std::vector<int> numbers;
+
+    char data[1024];
+    udp::endpoint sender_endpoint;
+
+    while (true) {
+        size_t length = socket.receive_from(asio::buffer(data), sender_endpoint);
+        std::string message(data, length);
+        int value = std::stoi(message);
+
+        if (value == 0) {
+            int sum = 0;
+            for (int num : numbers) sum += num;
+            int average = numbers.empty() ? 0 : sum / numbers.size();
+            std::string avg_message = std::to_string(average);
+            socket.send_to(asio::buffer(avg_message), sender_endpoint);
+        } else if (value == -1) {
+            break;
+        } else {
+            numbers.push_back(value);
+        }
+    }
+}
+
+### Slave
+
+#include <iostream>
+#include <asio.hpp>
+
+using asio::ip::udp;
+
+void send_to_master(const std::string& host, short port, int number) {
+    asio::io_context io_context;
+    udp::socket socket(io_context);
+    socket.open(udp::v4());
+
+    udp::endpoint master_endpoint(asio::ip::make_address(host), port);
+    std::string message = std::to_string(number);
+    socket.send_to(asio::buffer(message), master_endpoint);
+}
+
+int main() {
+    send_to_master("127.0.0.1", 12345, 10);
+    return 0;
+}
+
+
+## Podsumowanie
+Dokumentacja opisuje szczegółowe działanie każdej części kodu aplikacji DAS oraz przedstawia przykłady implementacji zarówno dla `master`, jak i `slave` w języku C++.
+Pozwala to na łatwą adaptację aplikacji do innych środowisk programistycznych.
+
