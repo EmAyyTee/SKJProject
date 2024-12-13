@@ -20,7 +20,7 @@ public class DAS {
         }else if(args.length < 2){
 
 
-            System.out.println("Tell me what to do:\n1) Run test cases\n2)Run the server");
+            System.out.println("Tell me what to do:\n1) Run test cases\n2)Run DAS");
             Scanner sc = new Scanner(System.in);
 
             int answerFromUser = Integer.parseInt(sc.nextLine());

@@ -36,7 +36,7 @@ public class DASclass {
             int recivedValue = 0;
 
             if (message.contains(".")){
-                System.out.println("Recived broadcasted average: " + message);
+                System.out.println("Recived average: " + message);
                 continue;
             }else {
                 try {
