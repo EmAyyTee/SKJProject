@@ -4,7 +4,11 @@ import java.util.concurrent.TimeUnit;
 
 public class DAS {
     public static void main(String[] args) throws InterruptedException {
-        if (args.length == 2){
+        if (args.length == 1 || args.length > 2){
+            System.out.println("Correct uses of application:\njavac ./DAS.java [port_number] [number_message]\nor\n" +
+                    "javac ./DAS.java");
+        }
+        else if (args.length == 2){
             int masterPort = Integer.parseInt(args[0]);
             int numberToInput = Integer.parseInt(args[1]);
             Thread masterThread = new Thread(() -> {
@@ -47,9 +51,6 @@ public class DAS {
                     System.out.println("Invalid input");
                 }
             }
-        } else {
-            System.out.println("Correct uses of application:\njavac ./DAS.java [port_number] [number_message]\n" +
-                    "javac ./DAS.java");
         }
     }
 }
